@@ -1,54 +1,109 @@
-import { useEffect } from "react";
-import "./App.css";
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './contexts/AuthContext';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Import pages
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Services from './pages/Services';
+import Eulogies from './pages/Eulogies';
+import Downloads from './pages/Downloads';
+import Admin from './pages/Admin';
+import GmailItax from './pages/GmailItax';
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
+    <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <div className="App min-h-screen bg-gray-50">
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                theme: {
+                  primary: '#4aed88',
+                },
+              },
+            }}
+          />
+          
+          <Navbar />
+          
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/eulogies" element={<Eulogies />} />
+              <Route 
+                path="/downloads" 
+                element={
+                  <ProtectedRoute>
+                    <Downloads />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute adminOnly>
+                    <Admin />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/gmail-itax" 
+                element={
+                  <ProtectedRoute>
+                    <GmailItax />
+                  </ProtectedRoute>
+                } 
+              />
+              {/* Catch all route - 404 page */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          
+          <Footer />
+        </div>
       </BrowserRouter>
-    </div>
+    </AuthProvider>
   );
 }
+
+// Simple 404 component
+const NotFound = () => {
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Page Not Found</h2>
+        <p className="text-gray-600 mb-8">
+          The page you're looking for doesn't exist.
+        </p>
+        <a 
+          href="/" 
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+        >
+          Go Home
+        </a>
+      </div>
+    </div>
+  );
+};
 
 export default App;
