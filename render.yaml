@@ -1,0 +1,47 @@
+services:
+  # Backend API Service
+  - type: web
+    name: twoem-backend
+    env: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn server:app --host 0.0.0.0 --port $PORT"
+    plan: free
+    envVars:
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        value: twoem_production
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_EXPIRATION_HOURS
+        value: 24
+      - key: ADMIN_EMAIL
+        value: admin@twoem.com
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: UPLOAD_DIR
+        value: uploads
+      - key: MAX_FILE_SIZE
+        value: 50000000
+      - key: ENCRYPTION_KEY
+        generateValue: true
+
+  # Frontend Static Site
+  - type: web
+    name: twoem-frontend
+    env: static
+    buildCommand: "cd frontend && yarn install && yarn build"
+    staticPublishPath: frontend/build
+    plan: free
+    envVars:
+      - key: REACT_APP_BACKEND_URL
+        fromService:
+          type: web
+          name: twoem-backend
+          property: host
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
