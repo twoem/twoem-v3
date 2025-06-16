@@ -13,7 +13,7 @@ import base64
 import uuid
 
 # Import our models and utilities
-from models import (
+from .models import (
     User, UserCreate, UserLogin, UserResponse, Token,
     File, FileCreate, FileResponse, FileUpdate,
     Eulogy, EulogyCreate, EulogyResponse,
@@ -21,12 +21,12 @@ from models import (
     Credentials, CredentialsCreate, CredentialsResponse,
     Service, ServiceResponse
 )
-from auth import (
+from .auth import (
     get_password_hash, authenticate_user, create_access_token,
     get_current_user, get_current_admin_user, create_user_response,
     security
 )
-from utils import (
+from .utils import (
     save_file_to_disk, read_file_as_base64, calculate_expiry_date,
     is_expired, encrypt_string, decrypt_string, is_valid_file_type,
     format_file_size
